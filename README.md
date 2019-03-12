@@ -1,20 +1,24 @@
-
 ## CloudBeat plugin for Java Cucumber 
 
 ### Intro
-CloudBeat plugin for Java based Cucumber projects.
+This plugin allows executing Java based Cucumber tests using the CloudBeat platform.
 
-### Configuration
-Add the plugin to your project. For maven projects just add this dependency:
+### Building
+`git clone https://github.com/oxygenhq/cb-framework-plugin-cucumber-java`
+`cd cb-framework-plugin-cucumber-java`
+`mvn install`
+
+### Usage
+Add the plugin to your project. If you are using a maven based project, you can directly add this library as a dependency:
 ```xml
 <dependency>  
   <groupId>io.cloudbeat.cucumber</groupId>  
   <artifactId>cb-plugin-cucumber</artifactId>  
-  <version>0.1</version>  
+  <version>0.1-SNAPSHOT</version>  
 </dependency>
 ```
 
-Add `io.cloudbeat.cucumber.Plugin` to Cucumber options and make sure the class anotated with `@RunWith(Cucumber.class)` extends `CucumberRunner`
+Add `io.cloudbeat.cucumber.Plugin` to Cucumber options and make sure the class annotated with `@RunWith(Cucumber.class)` extends `CucumberRunner`
 
 ```java
 @RunWith(Cucumber.class)
@@ -25,6 +29,13 @@ public class RunCucumberTest extends CucumberRunner {
 
 ### Working with Selenium
 
+When using Selenium it might be beneficiary to be able to take browser screenshots in case of failures.
+This can be achieved in a three different ways. Please note that all 3 options are mutually exclusive.
+
+1. By embedding screenshots manually from `@After()` method within the glue classes. Screenshot should be embedded as a Base64 string using the `image/png` mime type. See the examples below for more details.
+2. By providing WebDriver instance to the plugin.
+3. By providing WebDriver getter method to the plugin.
+
 #### Embedding screenshots manually
 
 ```java
@@ -33,23 +44,17 @@ public class SeleniumDefs {
 
     @Given("^I am on the Google search page$")
     public void I_visit_google() {
-        driver.get("https:\\www.google.com");
+        ...
     }
 
     @When("^I search for \"(.*)\"$")
     public void search_for(String query) {
-        WebElement element = driver.findElement(By.name("q"));
-        element.sendKeys(query);
-        element.submit();
+        ...
     }
 
     @Then("^the page title should start with \"(.*)\"$")
     public void checkTitle(String titleStartsWith) {
-        new WebDriverWait(driver,10L).until(new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver d) {
-                return d.getTitle().toLowerCase().startsWith(titleStartsWith);
-            }
-        });
+        ...
     }
 
     @After()
