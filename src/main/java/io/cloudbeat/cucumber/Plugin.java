@@ -72,9 +72,8 @@ public final class Plugin implements EventListener {
             testMonitorStatusUrl = testmonitorurl + "/status";
             testMonitorResultUrl = testmonitorurl + "/result";
 
-            PayloadReader pReader = new PayloadReader();
             try {
-                payload = pReader.Read(payloadpath);
+                payload = PayloadModel.Load(payloadpath);
                 // pre-init results object
                 result = new ResultModel();
                 result.runId = payload.runId;

@@ -1,12 +1,12 @@
-## CloudBeat plugin for Java Cucumber 
+## CloudBeat plugin for Cucumber-Java
 
 ### Intro
 This plugin allows executing Java based Cucumber tests using the CloudBeat platform.
 
 ### Building
-`git clone https://github.com/oxygenhq/cb-framework-plugin-cucumber-java`
-`cd cb-framework-plugin-cucumber-java`
-`mvn install`
+`git clone https://github.com/oxygenhq/cb-framework-plugin-cucumber-java`  
+`cd cb-framework-plugin-cucumber-java`  
+`mvn install`  
 
 ### Usage
 Add the plugin to your project. If you are using a maven based project, you can directly add this library as a dependency:
