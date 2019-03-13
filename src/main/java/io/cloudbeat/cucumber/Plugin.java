@@ -91,7 +91,7 @@ public final class Plugin implements EventListener {
 
                 isInitialized = true;
             } catch (Exception e) {
-                logError("Plugin will be disabled. Unable to read payload file: " + e);
+                logError("Plugin will be disabled. Unable to read/deserialize payload file.", e);
             }
         } else {
             logInfo("Plugin will be disabled. One of payloadpath, testmonitorurl, or testmonitortoken parameters is missing.");
@@ -278,7 +278,7 @@ public final class Plugin implements EventListener {
                     try {
                         step.failure =  failure == null ? null : new ObjectMapper().writeValueAsString(failure);
                     } catch (JsonProcessingException e) {
-                        logError("Cannot serialize failure details for " + cucumberId + ". " + e);
+                        logError("Cannot serialize failure details for " + cucumberId, e);
                     }
 
                     caseIteration.steps.add(step);
@@ -297,7 +297,6 @@ public final class Plugin implements EventListener {
                 if (!caseIteration.isSuccess)
                     isSuccess = false;
             }
-
         }
 
         iter.isSuccess = isSuccess;
@@ -564,7 +563,7 @@ public final class Plugin implements EventListener {
 
 
         } catch (Exception e) {
-            logError("Unable to report to " + endpointUrl + " : " + e);
+            logError("Unable to report to " + endpointUrl, e);
             return false;
         } finally {
             if (http != null)
@@ -575,10 +574,15 @@ public final class Plugin implements EventListener {
     }
 
     private void logError(String message) {
-        System.err.println("CloudBeat: " + message);
+        System.err.println("[CloudBeat] " + message);
+    }
+
+    private void logError(String message, Exception e) {
+        System.err.println("[CloudBeat] " + message);
+        e.printStackTrace();
     }
 
     private void logInfo(String message) {
-        System.out.println("CloudBeat: " + message);
+        System.out.println("[CloudBeat] " + message);
     }
 }
