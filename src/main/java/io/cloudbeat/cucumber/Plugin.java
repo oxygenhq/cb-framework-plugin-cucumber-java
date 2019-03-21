@@ -544,6 +544,7 @@ public final class Plugin implements EventListener {
             http.setRequestMethod("POST");
             http.setRequestProperty("Authorization", "Bearer " + testMonitorToken);
             http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            http.setRequestProperty("Connection", "Close");
             http.setDoOutput(true);
             http.setFixedLengthStreamingMode(length);
             http.connect();
