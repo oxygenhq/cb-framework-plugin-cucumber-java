@@ -1,5 +1,8 @@
 package io.cloudbeat.cucumber;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.cloudbeat.cucumber.serializers.DateSerializer;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +15,9 @@ public class ResultModel {
     public Map<String, String> metadata;
     public Map<String, String> capabilities;
     public String environmentVariables;
+    @JsonSerialize(using = DateSerializer.class)
     public Date startTime;
+    @JsonSerialize(using = DateSerializer.class)
     public Date endTime;
     public double duration;
     public int retries;
