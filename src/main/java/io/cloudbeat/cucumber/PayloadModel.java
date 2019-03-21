@@ -36,18 +36,18 @@ public class PayloadModel {
         JsonNode rootNode = mapper.readValue(json, JsonNode.class);
         TypeReference<Map<String, Object>> mapTypeRef = new TypeReference<Map<String, Object>>() {};
 
-        payload.runId = rootNode.get("runId").textValue();
-        payload.instanceId = rootNode.get("instanceId").textValue();
-        payload.capabilities = mapper.readValue(rootNode.get("capabilities").toString(), mapTypeRef);
-        payload.metadata = mapper.readValue(rootNode.get("metadata").toString(), mapTypeRef);
-        payload.environmentVariables = rootNode.get("environmentVariables").textValue();
+        payload.runId = rootNode.get("RunId").textValue();
+        payload.instanceId = rootNode.get("InstanceId").textValue();
+        payload.capabilities = mapper.readValue(rootNode.get("Capabilities").toString(), mapTypeRef);
+        payload.metadata = mapper.readValue(rootNode.get("Metadata").toString(), mapTypeRef);
+        payload.environmentVariables = rootNode.get("EnvironmentVariables").textValue();
 
-        for (JsonNode caseNode : rootNode.get("cases")) {
+        for (JsonNode caseNode : rootNode.get("Cases")) {
             PayloadModel.Case caze = new PayloadModel.Case();
-            caze.id = caseNode.get("id").asLong();
-            JsonNode details =  caseNode.get("details");
+            caze.id = caseNode.get("Id").asLong();
+            JsonNode details =  caseNode.get("Details");
             caze.cucumberId = details.get("cucumberId").textValue();
-            caze.order = caseNode.get("order").asInt();
+            caze.order = caseNode.get("Order").asInt();
             payload.cases.put(caze.cucumberId, caze);
         }
 
