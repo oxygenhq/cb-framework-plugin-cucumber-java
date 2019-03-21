@@ -45,7 +45,8 @@ public class PayloadModel {
         for (JsonNode caseNode : rootNode.get("cases")) {
             PayloadModel.Case caze = new PayloadModel.Case();
             caze.id = caseNode.get("id").asLong();
-            caze.cucumberId = caseNode.get("cucumberId").textValue();
+            JsonNode details =  caseNode.get("details");
+            caze.cucumberId = details.get("cucumberId").textValue();
             caze.order = caseNode.get("order").asInt();
             payload.cases.put(caze.cucumberId, caze);
         }
