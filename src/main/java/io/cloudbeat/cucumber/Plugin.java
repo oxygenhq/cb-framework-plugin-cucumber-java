@@ -205,8 +205,9 @@ public final class Plugin implements EventListener {
         result.iterations = new ArrayList<>();
 
         ResultModel.SuiteIteration iter = new ResultModel.SuiteIteration();
-        iter.iterationNum = 1;
+        result.iterations.add(iter);
 
+        iter.iterationNum = 1;
         iter.cases = new ArrayList<>();
 
         for (Map<String, Object> feature : featureMaps) {
@@ -214,6 +215,7 @@ public final class Plugin implements EventListener {
 
             for (Map<String, Object> scenario : scenarios) {
                 ResultModel.Case caze = new ResultModel.Case();
+                iter.cases.add(caze);
 
                 String cucumberId = (String)scenario.get("cucumberId");
 
@@ -229,6 +231,8 @@ public final class Plugin implements EventListener {
                 caze.iterations = new ArrayList<>();
 
                 ResultModel.CaseIteration caseIteration = new ResultModel.CaseIteration();
+                caze.iterations.add(caseIteration);
+
                 caseIteration.iterationNum = 1;
 
                 caseIteration.hasWarnings = false;
