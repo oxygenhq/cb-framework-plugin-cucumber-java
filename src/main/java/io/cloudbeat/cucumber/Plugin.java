@@ -53,6 +53,7 @@ public final class Plugin implements EventListener {
     private String testMonitorResultUrl;
     private String testMonitorToken;
     private boolean isInitialized = false;
+    private int currentCaseIndex = 1;
 
     private EventHandler<TestSourceRead> testSourceReadHandler = event -> handleTestSourceRead(event);
     private EventHandler<TestCaseStarted> caseStartedHandler = event -> handleTestCaseStarted(event);
@@ -142,10 +143,11 @@ public final class Plugin implements EventListener {
 
         StatusModel status = new StatusModel();
 
-        status.status = StatusModel.Statuses.Finished.getValue();
+        status.status = StatusModel.Statuses.Running.getValue();
         status.instanceId = payload.instanceId;
         status.runId = payload.runId;
         status.caze = new StatusModel.CaseStatus();
+        status.progress = (float)currentCaseIndex / payload.cases.size();
 
         String cucumberId = getCucumberScenarioId(event.testCase.getScenarioDesignation());
 
@@ -156,10 +158,13 @@ public final class Plugin implements EventListener {
         }
 
         status.caze.id = caseDefinition.id;
-        status.caze.order = caseDefinition.order;
+        status.caze.order = currentCaseIndex;
         status.caze.progress = 1;
+        status.caze.name = event.testCase.getName();
         status.caze.iterationsFailed = isPassed ? 0 : 1;
         status.caze.iterationsPassed = isPassed ? 1 : 0;
+
+        currentCaseIndex++;
 
         if (report(testMonitorStatusUrl, status))
             logInfo("Status report for '" + cucumberId + "' has been sent");
@@ -199,7 +204,7 @@ public final class Plugin implements EventListener {
 
     private void finishReport() {
         result.endTime = new Date();
-        result.duration = (result.endTime.getTime() -  result.startTime.getTime()) / 1000;
+        result.duration = (result.endTime.getTime() -  result.startTime.getTime()) / 1000d;
         result.retries = 0;
 
         result.iterations = new ArrayList<>();
