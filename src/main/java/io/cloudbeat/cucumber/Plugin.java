@@ -28,9 +28,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -54,6 +52,7 @@ public final class Plugin implements EventListener {
     private String testMonitorToken;
     private boolean isInitialized = false;
     private int currentCaseIndex = 1;
+    private final static String DONE_FILENAME = ".CB_DONE";
 
     private EventHandler<TestSourceRead> testSourceReadHandler = event -> handleTestSourceRead(event);
     private EventHandler<TestCaseStarted> caseStartedHandler = event -> handleTestCaseStarted(event);
@@ -316,8 +315,14 @@ public final class Plugin implements EventListener {
         result.iterationsFailed = isSuccess ? 0 : 1;
         result.iterationsWarning = 0;
 
-        if (report(testMonitorResultUrl, result))
+        if (report(testMonitorResultUrl, result)) {
             logInfo("Result report has been sent");
+            try {
+                new File(DONE_FILENAME).createNewFile();
+            } catch (IOException e) {
+                logError("Failed to create " + DONE_FILENAME, e);
+            }
+        }
     }
 
     private Map<String, Object> createFeatureMap(TestCase testCase) {
