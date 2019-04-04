@@ -559,7 +559,7 @@ public final class Plugin implements EventListener {
             }
 
             int responseCode = http.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
+            if (responseCode < 200 || responseCode > 299) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(http.getInputStream()))) {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
