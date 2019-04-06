@@ -11,7 +11,6 @@ public class ResultModel {
 
     public String runId;
     public String instanceId;
-    public String nodeId;
     public Map<String, String> metadata;
     public Map<String, String> capabilities;
     public String environmentVariables;
@@ -35,6 +34,7 @@ public class ResultModel {
         public boolean isSuccess;
         public List<Case> cases;
     }
+
     public static class Case
     {
         public long id;
@@ -42,6 +42,7 @@ public class ResultModel {
         public boolean isSuccess;
         public List<CaseIteration> iterations;
     }
+
     public static class CaseIteration
     {
         public int iterationNum;
@@ -52,6 +53,7 @@ public class ResultModel {
         public Map<String, String> har;
         public List<Step> steps;
     }
+
     public static class Step
     {
         public String name;
