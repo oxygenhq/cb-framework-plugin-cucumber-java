@@ -48,11 +48,10 @@ public final class Plugin implements EventListener {
     private PayloadModel payload;
     private ResultModel result;
     private String testMonitorStatusUrl;
-    private String testMonitorResultUrl;
     private String testMonitorToken;
     private boolean isInitialized = false;
     private int currentCaseIndex = 1;
-    private final static String DONE_FILENAME = ".CB_DONE";
+    private final static String TEST_RESULTS_FILENAME = ".CB_TEST_RESULTS";
     private final static String ERR_CUCUMBER_ERROR = "CUCUMBER_ERROR";
 
     private EventHandler<TestSourceRead> testSourceReadHandler = event -> handleTestSourceRead(event);
@@ -71,7 +70,6 @@ public final class Plugin implements EventListener {
 
         if (payloadpath != null && testmonitorurl != null && testMonitorToken != null) {
             testMonitorStatusUrl = testmonitorurl + "/status";
-            testMonitorResultUrl = testmonitorurl + "/result";
 
             try {
                 payload = PayloadModel.Load(payloadpath);
@@ -322,13 +320,21 @@ public final class Plugin implements EventListener {
         result.iterationsFailed = isSuccess ? 0 : 1;
         result.iterationsWarning = 0;
 
-        if (report(testMonitorResultUrl, result)) {
-            logInfo("Result report has been sent");
-            try {
-                new File(DONE_FILENAME).createNewFile();
-            } catch (IOException e) {
-                logError("Failed to create " + DONE_FILENAME, e);
-            }
+        ObjectMapper mapper = new ObjectMapper();
+        String resultJson;
+        try {
+            resultJson = mapper.writeValueAsString(result);
+        } catch (JsonProcessingException e) {
+            logError("Failed to serialize results.", e);
+            return;
+        }
+
+        try {
+            PrintWriter writer = new PrintWriter(TEST_RESULTS_FILENAME, "UTF-8");
+            writer.write(resultJson);
+            writer.close();
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            logError("Failed to create " + TEST_RESULTS_FILENAME, e);
         }
     }
 
