@@ -53,6 +53,7 @@ public final class Plugin implements EventListener {
     private boolean isInitialized = false;
     private int currentCaseIndex = 1;
     private final static String DONE_FILENAME = ".CB_DONE";
+    private final static String ERR_CUCUMBER_ERROR = "CUCUMBER_ERROR";
 
     private EventHandler<TestSourceRead> testSourceReadHandler = event -> handleTestSourceRead(event);
     private EventHandler<TestCaseStarted> caseStartedHandler = event -> handleTestCaseStarted(event);
@@ -256,8 +257,8 @@ public final class Plugin implements EventListener {
                     if (!stepStatus) {
                         isSuccess = false;
                         failure = new FailureModel();
-                        failure.type = "CUCUMBER_ERROR"; // FIXME
-                        failure.message = (String)cucStepResult.get("error_message");
+                        failure.type = ERR_CUCUMBER_ERROR;
+                        failure.data = (String)cucStepResult.get("error_message");
                     }
 
                     ResultModel.Step step = new ResultModel.Step();
