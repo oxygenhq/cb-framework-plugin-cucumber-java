@@ -258,7 +258,11 @@ public final class Plugin implements EventListener {
                         isSuccess = false;
                         failure = new FailureModel();
                         failure.type = ERR_CUCUMBER_ERROR;
-                        failure.data = (String)cucStepResult.get("error_message");
+                        // error_message won't be always present. For example it's not present on "skipped" (e.g. unimplemented) steps
+                        if (cucStepResult.containsKey("error_message"))
+                            failure.data = (String)cucStepResult.get("error_message");
+                        else
+                            failure.message = "See console log for more details";
                     }
 
                     ResultModel.Step step = new ResultModel.Step();
