@@ -284,7 +284,7 @@ public final class Plugin implements EventListener {
                     }
 
                     if (cucStepResult.containsKey("duration"))
-                        step.duration = (long)cucStepResult.get("duration") / 1000d;
+                        step.duration = (long)cucStepResult.get("duration") / 1000000d;
 
                     step.iterationNum = 1;
 
