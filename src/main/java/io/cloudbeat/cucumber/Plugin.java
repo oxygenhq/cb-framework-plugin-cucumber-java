@@ -83,7 +83,13 @@ public final class Plugin implements EventListener {
                 result.startTime = new Date();
 
                 if (result.capabilities.containsKey("browserName")) {
-                    System.setProperty("browserName", result.capabilities.get("browserName"));
+                    // remove "technology" prefix from the browserName. old CB version uses technology.browser as browserName
+                    // FIXME: this should be removed once CB backend is adapted to send only the browser name without technology prefix.
+                    String browserName = result.capabilities.get("browserName");
+                    int browserNameIdx = browserName.indexOf('.');
+                    if (browserNameIdx > 0)
+                        browserName = browserName.substring(browserNameIdx + 1);
+                    System.setProperty("browserName", browserName);
                 } else {
                     logError("Plugin will be disabled. browserName is not specified in capabilities.");
                 }
