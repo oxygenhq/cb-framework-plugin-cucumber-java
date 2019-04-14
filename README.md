@@ -14,7 +14,7 @@ Add the plugin to your project. If you are using a maven based project, you can 
 <dependency>  
   <groupId>io.cloudbeat.cucumber</groupId>  
   <artifactId>cb-plugin-cucumber</artifactId>  
-  <version>0.1-SNAPSHOT</version>  
+  <version>0.8.0</version>  
 </dependency>
 ```
 
