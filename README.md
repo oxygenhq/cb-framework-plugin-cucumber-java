@@ -29,6 +29,15 @@ public class RunCucumberTest extends CucumberRunner {
 
 ### Working with Selenium
 
+#### Obtaining browser name
+Browser name is set by the plugin as a system property, and can be obtained using `System.getProperty`:
+
+```java
+String browserName = System.getProperty('browserName');
+```
+
+#### Automatic screenshots on failures
+
 When using Selenium it might be beneficiary to be able to take browser screenshots in case of failures.
 This can be achieved in a three different ways. Please note that all 3 options are mutually exclusive.
 
@@ -36,7 +45,7 @@ This can be achieved in a three different ways. Please note that all 3 options a
 2. By providing WebDriver instance to the plugin.
 3. By providing WebDriver getter method to the plugin.
 
-#### Embedding screenshots manually
+##### Embedding screenshots manually
 
 ```java
 public class SeleniumDefs {
@@ -72,7 +81,7 @@ public class SeleniumDefs {
 }
 ```
 
-#### Providing WebDriver instance
+##### Providing WebDriver instance
 ```java
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = {"pretty", "io.cloudbeat.cucumber.Plugin:"})
@@ -85,7 +94,7 @@ public class RunCucumberTest extends CucumberRunner {
 }
 ```
 
-#### Providing WebDriver getter method
+##### Providing WebDriver getter method
 ```java
 @RunWith(Cucumber.class)
 @CucumberOptions(plugin = {"pretty", "io.cloudbeat.cucumber.Plugin:"})
