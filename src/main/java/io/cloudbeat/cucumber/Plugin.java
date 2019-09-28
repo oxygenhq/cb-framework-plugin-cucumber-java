@@ -312,9 +312,11 @@ public final class Plugin implements EventListener {
 
         boolean isSuccess = true;
         for (ResultModel.Case caze : iter.cases) {
-            for (ResultModel.CaseIteration caseIteration : caze.iterations) {
-                if (!caseIteration.isSuccess)
-                    isSuccess = false;
+            if (caze.iterations != null) {
+                for (ResultModel.CaseIteration caseIteration : caze.iterations) {
+                    if (!caseIteration.isSuccess)
+                        isSuccess = false;
+                }
             }
         }
 
