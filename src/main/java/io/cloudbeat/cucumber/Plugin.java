@@ -277,10 +277,11 @@ public final class Plugin implements EventListener {
                     step.transactionName = step.name;
 
                     if (!isSuccess) {
-                        if (currentStepOrHookMap.containsKey("embeddings")) {
-                            for (Map<String, String> embedding : (List<Map<String, String>>)currentStepOrHookMap.get("embeddings")) {
-                                if (embedding.containsKey("mime_type") && embedding.containsKey("data") && "image/png".equals(embedding.get("mime_type"))) {
-                                    step.screenshot = embedding.get("data");
+                        if (scenario.containsKey("after")) {
+                            ArrayList<Map<String, Object>> afterHooks = (ArrayList<Map<String, Object>>)scenario.get("after");
+                            for (Map<String, Object> afterHook : afterHooks) {
+                                if (afterHook.containsKey("embeddings")) {
+                                    step.screenshot = getEmbeddedScreenshot((List<Map<String, String>>)afterHook.get("embeddings"));
                                     break;
                                 }
                             }
@@ -559,6 +560,15 @@ public final class Plugin implements EventListener {
         if (driver == null || !(driver instanceof TakesScreenshot))
             return null;
         return ((TakesScreenshot)driver).getScreenshotAs(OutputType.BASE64);
+    }
+
+    private String getEmbeddedScreenshot(List<Map<String, String>> embeddings) {
+        for (Map<String, String> embedding : embeddings) {
+            if (embedding.containsKey("mime_type") && embedding.containsKey("data") && "image/png".equals(embedding.get("mime_type"))) {
+                return embedding.get("data");
+            }
+        }
+        return null;
     }
 
     private boolean report(String endpointUrl, Object data) {
