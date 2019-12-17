@@ -37,16 +37,6 @@ public class StatusModel {
         public int iterationsPassed;
         public int iterationsFailed;
         public float progress;
-        public List<Failure> failures;
-
-        // FIXME: this should be updated on the backend
-        public class Failure {
-            public String message;
-            public String type;
-            public String subtype;
-            public int line;
-            public String details;
-            public boolean isFatal;
-        }
+        public List<FailureModel> failures;
     }
 }
