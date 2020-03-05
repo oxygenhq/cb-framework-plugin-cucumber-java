@@ -253,8 +253,9 @@ public final class Plugin implements EventListener {
                         failure = new FailureModel();
                         failure.type = ERR_CUCUMBER_ERROR;
                         // error_message won't be always present. For example it's not present on "skipped" (e.g. unimplemented) steps
-                        if (cucStepResult.containsKey("error_message"))
-                            failure.data = (String)cucStepResult.get("error_message");
+                        if (cucStepResult.containsKey("error_message")){
+                            failure.message = (String)cucStepResult.get("error_message");
+                        }
                         else
                             failure.message = "See console log for more details";
                     }
@@ -263,7 +264,7 @@ public final class Plugin implements EventListener {
 
                     step.name = (String)cucStep.get("name");
                     step.order = order;
-                    step.status = ResultStatus.valueOf(cucStepResult.get("status").toString());
+                    step.status = stepStatus ? ResultStatus.Passed : ResultStatus.Failed;
                     step.transaction = step.name;
 
                     if (!isSuccess) {
@@ -280,7 +281,7 @@ public final class Plugin implements EventListener {
                     }
 
                     if (cucStepResult.containsKey("duration"))
-                        step.duration = (long)((double)cucStepResult.get("duration") / 1000000d);
+                        step.duration = (long)((long)cucStepResult.get("duration") / 1000000d);
 
                     step.failure = failure;
                     caze.steps.add(step);
