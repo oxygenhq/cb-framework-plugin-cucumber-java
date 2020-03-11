@@ -208,23 +208,21 @@ public final class Plugin implements EventListener {
 
     private void finishReport() {
         result.endTime = new Date();
-        result.duration = (result.endTime.getTime() -  result.startTime.getTime()) / 1000d;
-        result.retries = 0;
+        result.duration = (result.endTime.getTime() -  result.startTime.getTime()) / 1000L;
 
-        result.iterations = new ArrayList<>();
+        result.suites = new ArrayList<>();
 
-        ResultModel.SuiteIteration iter = new ResultModel.SuiteIteration();
-        result.iterations.add(iter);
+        SuiteModel suite = new SuiteModel();
+        result.suites.add(suite);
 
-        iter.iterationNum = 1;
-        iter.cases = new ArrayList<>();
+        suite.cases = new ArrayList<>();
 
         for (Map<String, Object> feature : featureMaps) {
             List<Map<String, Object>> scenarios = (List<Map<String, Object>>)feature.get("elements");
 
             for (Map<String, Object> scenario : scenarios) {
-                ResultModel.Case caze = new ResultModel.Case();
-                iter.cases.add(caze);
+                CaseModel caze = new CaseModel();
+                suite.cases.add(caze);
 
                 String cucumberId = (String)scenario.get("cucumberId");
 
@@ -237,18 +235,10 @@ public final class Plugin implements EventListener {
                 caze.id = caseDefinition.id;
                 caze.name = (String)scenario.get("name");
 
-                caze.iterations = new ArrayList<>();
 
-                ResultModel.CaseIteration caseIteration = new ResultModel.CaseIteration();
-                caze.iterations.add(caseIteration);
+                caze.iterationNum = 1;
 
-                caseIteration.iterationNum = 1;
-
-                caseIteration.hasWarnings = false;
-                caseIteration.context = null;
-                caseIteration.failure = null;
-                caseIteration.har = null;
-                caseIteration.steps = new ArrayList<>();
+                caze.steps = new ArrayList<>();
 
                 boolean isSuccess = true;
                 short order = 0;
@@ -263,71 +253,55 @@ public final class Plugin implements EventListener {
                         failure = new FailureModel();
                         failure.type = ERR_CUCUMBER_ERROR;
                         // error_message won't be always present. For example it's not present on "skipped" (e.g. unimplemented) steps
-                        if (cucStepResult.containsKey("error_message"))
-                            failure.data = (String)cucStepResult.get("error_message");
+                        if (cucStepResult.containsKey("error_message")){
+                            failure.message = (String)cucStepResult.get("error_message");
+                        }
                         else
                             failure.message = "See console log for more details";
                     }
 
-                    ResultModel.Step step = new ResultModel.Step();
+                    StepModel step = new StepModel();
 
                     step.name = (String)cucStep.get("name");
                     step.order = order;
-                    step.isSuccess = stepStatus;
-                    step.transactionName = step.name;
+                    step.status = stepStatus ? ResultStatus.Passed : ResultStatus.Failed;
+                    step.transaction = step.name;
 
                     if (!isSuccess) {
-                        if (scenario.containsKey("after")) {
-                            ArrayList<Map<String, Object>> afterHooks = (ArrayList<Map<String, Object>>)scenario.get("after");
-                            for (Map<String, Object> afterHook : afterHooks) {
-                                if (afterHook.containsKey("embeddings")) {
-                                    step.screenshot = getEmbeddedScreenshot((List<Map<String, String>>)afterHook.get("embeddings"));
+                        if (currentStepOrHookMap.containsKey("embeddings")) {
+                            for (Map<String, String> embedding : (List<Map<String, String>>)currentStepOrHookMap.get("embeddings")) {
+                                if (embedding.containsKey("mime_type") && embedding.containsKey("data") && "image/png".equals(embedding.get("mime_type"))) {
+                                    step.screenShot = embedding.get("data");
                                     break;
                                 }
                             }
                         } else {
-                            step.screenshot = takeWebDriverScreenshot();
+                            step.screenShot = takeWebDriverScreenshot();
                         }
                     }
 
                     if (cucStepResult.containsKey("duration"))
-                        step.duration = (long)cucStepResult.get("duration") / 1000000d;
+                        step.duration = (long)((long)cucStepResult.get("duration") / 1000000d);
 
-                    step.iterationNum = 1;
-
-                    try {
-                        step.failure =  failure == null ? null : new ObjectMapper().writeValueAsString(failure);
-                    } catch (JsonProcessingException e) {
-                        logError("Cannot serialize failure details for " + cucumberId, e);
-                    }
-
-                    caseIteration.steps.add(step);
+                    step.failure = failure;
+                    caze.steps.add(step);
 
                     order++;
                 }
 
-                caseIteration.isSuccess = isSuccess;
-                caze.isSuccess = isSuccess;
+                caze.status = isSuccess ? ResultStatus.Passed : ResultStatus.Failed;
             }
         }
 
         boolean isSuccess = true;
-        for (ResultModel.Case caze : iter.cases) {
-            if (caze.iterations != null) {
-                for (ResultModel.CaseIteration caseIteration : caze.iterations) {
-                    if (!caseIteration.isSuccess)
+        for (CaseModel caze : suite.cases) {
+            if (caze.status == ResultStatus.Failed) {
                         isSuccess = false;
-                }
             }
         }
 
-        iter.isSuccess = isSuccess;
-
-        result.isSuccess = isSuccess;
-        result.iterationsTotal = 1;
-        result.iterationsPassed = isSuccess ? 0 : 1;
-        result.iterationsFailed = isSuccess ? 0 : 1;
-        result.iterationsWarning = 0;
+        suite.status = isSuccess ? ResultStatus.Passed : ResultStatus.Failed;
+        result.status = isSuccess ? ResultStatus.Passed : ResultStatus.Failed;
 
         ObjectMapper mapper = new ObjectMapper();
         String resultJson;
