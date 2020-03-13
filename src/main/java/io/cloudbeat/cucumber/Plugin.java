@@ -265,8 +265,7 @@ public final class Plugin implements EventListener {
                     step.name = (String)cucStep.get("name");
                     step.order = order;
                     step.status = stepStatus ? ResultStatus.Passed : ResultStatus.Failed;
-                    step.transaction = step.name;
-
+                    
                     if (!isSuccess) {
                         if (currentStepOrHookMap.containsKey("embeddings")) {
                             for (Map<String, String> embedding : (List<Map<String, String>>)currentStepOrHookMap.get("embeddings")) {
